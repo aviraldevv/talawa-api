@@ -22,8 +22,6 @@ jobs:
     steps:
       - name: Unauthorized file modification in PR
         run: exit 1
-  name: Codecov
-  uses: codecov/codecov-action@v3.1.1
 
 
 
