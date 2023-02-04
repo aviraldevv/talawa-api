@@ -10,7 +10,6 @@ import {
 } from "vitest";
 import { connect, disconnect } from "../../src/db";
 import {
-  USER_NOT_AUTHORIZED,
   USER_NOT_AUTHORIZED_MESSAGE,
 } from "../../src/constants";
 import {
@@ -39,8 +38,17 @@ describe("utilities -> adminCheck", () => {
     vi.resetModules();
   });
 
-  it("should throw error if userIsOrganizationAdmin === false", async () => {
-   
+  it("throws error if userIsOrganizationAdmin === false and IN_PRODUCTION === true", async () => {
+    vi.doMock("../../src/constants", async () => {
+      const actualConstants: object = await vi.importActual(
+        "../../src/constants"
+      );
+      return {
+        ...actualConstants,
+        IN_PRODUCTION: true,
+      };
+    });
+
     const { requestContext } = await import("../../src/libraries");
 
     const spy = vi
