@@ -7,9 +7,12 @@ import {
   CHAT_NOT_FOUND_MESSAGE,
   ORGANIZATION_NOT_FOUND_MESSAGE,
   USER_ALREADY_MEMBER_MESSAGE,
-  USER_NOT_AUTHORIZED,
   USER_NOT_FOUND_MESSAGE,
+  USER_NOT_AUTHORIZED_MESSAGE,
 } from "../../../src/constants";
+import i18n from "i18n";
+import express from "express";
+import { appConfig } from "../../../src/config";
 import {
   beforeAll,
   afterAll,
@@ -24,6 +27,25 @@ import {
   testGroupChatType,
   createTestGroupChat,
 } from "../../helpers/groupChat";
+
+const app = express();
+i18n.configure({
+  directory: `${__dirname}/locales`,
+  staticCatalog: {
+    en: require("../../../locales/en.json"),
+    hi: require("../../../locales/hi.json"),
+    zh: require("../../../locales/zh.json"),
+    sp: require("../../../locales/sp.json"),
+    fr: require("../../../locales/fr.json"),
+  },
+  queryParameter: "lang",
+  defaultLocale: appConfig.defaultLocale,
+  locales: appConfig.supportedLocales,
+  autoReload: process.env.NODE_ENV !== "production",
+  updateFiles: process.env.NODE_ENV !== "production",
+  syncFiles: process.env.NODE_ENV !== "production",
+});
+app.use(i18n.init);
 
 let testUser: testUserType;
 let testOrganization: testOrganizationType;
@@ -126,6 +148,10 @@ describe("resolvers -> Mutation -> addUserToGroupChat", () => {
   it(`throws UnauthorizedError if current user with _id === context.userId is
   not an admin of organization with _id === groupChat.organization for groupChat
   with _id === args.chatId`, async () => {
+    const { requestContext } = await import("../../../src/libraries");
+    const spy = vi
+      .spyOn(requestContext, "translate")
+      .mockImplementationOnce((message) => message);
     try {
       await GroupChat.updateOne(
         {
@@ -157,12 +183,21 @@ describe("resolvers -> Mutation -> addUserToGroupChat", () => {
       const context = {
         userId: testUser!.id,
       };
+      vi.doMock("../../../src/constants", async () => {
+        const actualConstants: object = await vi.importActual(
+          "../../../src/constants"
+        );
+        return {
+          ...actualConstants,
+        };
+      });
       const { addUserToGroupChat } = await import(
         "../../../src/resolvers/Mutation/addUserToGroupChat"
       );
       await addUserToGroupChat?.({}, args, context);
     } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
+      expect(spy).toBeCalledWith(USER_NOT_AUTHORIZED_MESSAGE);
+      expect(error.message).toEqual(USER_NOT_AUTHORIZED_MESSAGE);
     }
   });
 

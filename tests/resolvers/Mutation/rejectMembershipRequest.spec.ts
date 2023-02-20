@@ -7,7 +7,7 @@ import { rejectMembershipRequest as rejectMembershipRequestResolver } from "../.
 import {
   MEMBERSHIP_REQUEST_NOT_FOUND_MESSAGE,
   ORGANIZATION_NOT_FOUND_MESSAGE,
-  USER_NOT_AUTHORIZED,
+  USER_NOT_AUTHORIZED_MESSAGE,
   USER_NOT_FOUND_MESSAGE,
 } from "../../../src/constants";
 import {
@@ -19,11 +19,33 @@ import {
   afterEach,
   vi,
 } from "vitest";
+import i18n from "i18n";
+import express from "express";
+import { appConfig } from "../../../src/config";
 import { testOrganizationType, testUserType } from "../../helpers/userAndOrg";
 import {
   createTestMembershipRequest,
   testMembershipRequestType,
 } from "../../helpers/membershipRequests";
+
+const app = express();
+i18n.configure({
+  directory: `${__dirname}/locales`,
+  staticCatalog: {
+    en: require("../../../locales/en.json"),
+    hi: require("../../../locales/hi.json"),
+    zh: require("../../../locales/zh.json"),
+    sp: require("../../../locales/sp.json"),
+    fr: require("../../../locales/fr.json"),
+  },
+  queryParameter: "lang",
+  defaultLocale: appConfig.defaultLocale,
+  locales: appConfig.supportedLocales,
+  autoReload: process.env.NODE_ENV !== "production",
+  updateFiles: process.env.NODE_ENV !== "production",
+  syncFiles: process.env.NODE_ENV !== "production",
+});
+app.use(i18n.init);
 
 let testUser: testUserType;
 let testOrganization: testOrganizationType;
@@ -182,6 +204,10 @@ describe("resolvers -> Mutation -> rejectMembershipRequest", () => {
   it(`throws UnauthorizedError if user with _id === context.userId is not an admin
   of organzation with _id === membershipRequest.organzation for membershipRequest 
   with _id === args.membershipRequestId`, async () => {
+    const { requestContext } = await import("../../../src/libraries");
+    const spy = vi
+      .spyOn(requestContext, "translate")
+      .mockImplementationOnce((message) => message);
     try {
       await MembershipRequest.updateOne(
         {
@@ -213,9 +239,13 @@ describe("resolvers -> Mutation -> rejectMembershipRequest", () => {
         userId: testUser!.id,
       };
 
+      const { rejectMembershipRequest: rejectMembershipRequestResolver } =
+        await import("../../../src/resolvers/Mutation/rejectMembershipRequest");
+
       await rejectMembershipRequestResolver?.({}, args, context);
     } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
+      expect(spy).toBeCalledWith(USER_NOT_AUTHORIZED_MESSAGE);
+      expect(error.message).toEqual(USER_NOT_AUTHORIZED_MESSAGE);
     }
   });
 

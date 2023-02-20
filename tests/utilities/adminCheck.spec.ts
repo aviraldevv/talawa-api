@@ -9,10 +9,7 @@ import {
   vi,
 } from "vitest";
 import { connect, disconnect } from "../../src/db";
-import {
-  USER_NOT_AUTHORIZED,
-  USER_NOT_AUTHORIZED_MESSAGE,
-} from "../../src/constants";
+import { USER_NOT_AUTHORIZED_MESSAGE } from "../../src/constants";
 import {
   createTestUserAndOrganization,
   testOrganizationType,
@@ -39,36 +36,7 @@ describe("utilities -> adminCheck", () => {
     vi.resetModules();
   });
 
-  it("throws error if userIsOrganizationAdmin === false and IN_PRODUCTION === false", async () => {
-    vi.doMock("../../src/constants", async () => {
-      const actualConstants: object = await vi.importActual(
-        "../../src/constants"
-      );
-      return {
-        ...actualConstants,
-        IN_PRODUCTION: false,
-      };
-    });
-
-    try {
-      const { adminCheck } = await import("../../src/utilities");
-      adminCheck(testUser!._id, testOrganization!);
-    } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
-    }
-  });
-
   it("throws error if userIsOrganizationAdmin === false and IN_PRODUCTION === true", async () => {
-    vi.doMock("../../src/constants", async () => {
-      const actualConstants: object = await vi.importActual(
-        "../../src/constants"
-      );
-      return {
-        ...actualConstants,
-        IN_PRODUCTION: true,
-      };
-    });
-
     const { requestContext } = await import("../../src/libraries");
 
     const spy = vi

@@ -6,7 +6,6 @@ import { connect, disconnect } from "../../../src/db";
 import { removeAdmin as removeAdminResolver } from "../../../src/resolvers/Mutation/removeAdmin";
 import {
   ORGANIZATION_NOT_FOUND_MESSAGE,
-  USER_NOT_AUTHORIZED,
   USER_NOT_FOUND_MESSAGE,
 } from "../../../src/constants";
 import {
@@ -115,71 +114,6 @@ describe("resolvers -> Mutation -> removeAdmin", () => {
     } catch (error: any) {
       expect(spy).toBeCalledWith(USER_NOT_FOUND_MESSAGE);
       expect(error.message).toEqual(USER_NOT_FOUND_MESSAGE);
-    }
-  });
-
-  it(`throws UnauthorizedError if user with _id === args.data.userId is not an admin
-  of organzation with _id === args.data.organizationId`, async () => {
-    try {
-      await Organization.updateOne(
-        {
-          _id: testOrganization!._id,
-        },
-        {
-          $set: {
-            admins: [],
-          },
-        }
-      );
-
-      const args: MutationRemoveAdminArgs = {
-        data: {
-          organizationId: testOrganization!.id,
-          userId: testUser!.id,
-        },
-      };
-
-      const context = {
-        userId: testUser!.id,
-      };
-
-      await removeAdminResolver?.({}, args, context);
-    } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
-    }
-  });
-
-  it(`throws UnauthorizedError if user with _id === context.userId is not the creator
-  of organization with _id === args.data.organizationId`, async () => {
-    try {
-      await Organization.updateOne(
-        {
-          _id: testOrganization!._id,
-        },
-        {
-          $push: {
-            admins: testUser!._id,
-          },
-          $set: {
-            creator: Types.ObjectId().toString(),
-          },
-        }
-      );
-
-      const args: MutationRemoveAdminArgs = {
-        data: {
-          organizationId: testOrganization!.id,
-          userId: testUser!.id,
-        },
-      };
-
-      const context = {
-        userId: testUser!.id,
-      };
-
-      await removeAdminResolver?.({}, args, context);
-    } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
     }
   });
 

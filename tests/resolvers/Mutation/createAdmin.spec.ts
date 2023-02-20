@@ -4,10 +4,12 @@ import { User, Organization } from "../../../src/models";
 import { MutationCreateAdminArgs } from "../../../src/types/generatedGraphQLTypes";
 import { connect, disconnect } from "../../../src/db";
 import { createAdmin as createAdminResolver } from "../../../src/resolvers/Mutation/createAdmin";
+import i18n from "i18n";
+import express from "express";
+import { appConfig } from "../../../src/config";
 import {
   ORGANIZATION_MEMBER_NOT_FOUND_MESSAGE,
   ORGANIZATION_NOT_FOUND_MESSAGE,
-  USER_NOT_AUTHORIZED,
   USER_NOT_AUTHORIZED_MESSAGE,
   USER_NOT_FOUND_MESSAGE,
 } from "../../../src/constants";
@@ -17,6 +19,25 @@ import {
   testOrganizationType,
   testUserType,
 } from "../../helpers/userAndOrg";
+
+const app = express();
+i18n.configure({
+  directory: `${__dirname}/locales`,
+  staticCatalog: {
+    en: require("../../../locales/en.json"),
+    hi: require("../../../locales/hi.json"),
+    zh: require("../../../locales/zh.json"),
+    sp: require("../../../locales/sp.json"),
+    fr: require("../../../locales/fr.json"),
+  },
+  queryParameter: "lang",
+  defaultLocale: appConfig.defaultLocale,
+  locales: appConfig.supportedLocales,
+  autoReload: process.env.NODE_ENV !== "production",
+  updateFiles: process.env.NODE_ENV !== "production",
+  syncFiles: process.env.NODE_ENV !== "production",
+});
+app.use(i18n.init);
 
 let testUser: testUserType;
 let testOrganization: testOrganizationType;
@@ -59,6 +80,10 @@ describe("resolvers -> Mutation -> createAdmin", () => {
 
   it(`throws UnauthorizedError if user with _id === context.userId is not the creator
   of organization with _id === args.data.organizationId`, async () => {
+    const { requestContext } = await import("../../../src/libraries");
+    const spy = vi
+      .spyOn(requestContext, "translate")
+      .mockImplementationOnce((message) => message);
     try {
       await Organization.updateOne(
         {
@@ -82,9 +107,19 @@ describe("resolvers -> Mutation -> createAdmin", () => {
         userId: testUser!.id,
       };
 
+      vi.doMock("../../../src/constants", async () => {
+        const actualConstants: object = await vi.importActual(
+          "../../../src/constants"
+        );
+        return {
+          ...actualConstants,
+        };
+      });
+
       await createAdminResolver?.({}, args, context);
     } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
+      expect(spy).toBeCalledWith(USER_NOT_AUTHORIZED_MESSAGE);
+      expect(error.message).toEqual(USER_NOT_AUTHORIZED_MESSAGE);
     }
   });
 

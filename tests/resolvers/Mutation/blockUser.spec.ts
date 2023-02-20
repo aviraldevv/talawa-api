@@ -6,10 +6,12 @@ import { connect, disconnect } from "../../../src/db";
 import { blockUser as blockUserResolver } from "../../../src/resolvers/Mutation/blockUser";
 import {
   ORGANIZATION_NOT_FOUND_MESSAGE,
-  USER_NOT_AUTHORIZED,
   USER_NOT_AUTHORIZED_MESSAGE,
   USER_NOT_FOUND_MESSAGE,
 } from "../../../src/constants";
+import i18n from "i18n";
+import express from "express";
+import { appConfig } from "../../../src/config";
 import { nanoid } from "nanoid";
 import { beforeAll, afterAll, describe, it, expect, vi } from "vitest";
 import {
@@ -17,6 +19,25 @@ import {
   testOrganizationType,
   createTestUser,
 } from "../../helpers/userAndOrg";
+
+const app = express();
+i18n.configure({
+  directory: `${__dirname}/locales`,
+  staticCatalog: {
+    en: require("../../../locales/en.json"),
+    hi: require("../../../locales/hi.json"),
+    zh: require("../../../locales/zh.json"),
+    sp: require("../../../locales/sp.json"),
+    fr: require("../../../locales/fr.json"),
+  },
+  queryParameter: "lang",
+  defaultLocale: appConfig.defaultLocale,
+  locales: appConfig.supportedLocales,
+  autoReload: process.env.NODE_ENV !== "production",
+  updateFiles: process.env.NODE_ENV !== "production",
+  syncFiles: process.env.NODE_ENV !== "production",
+});
+app.use(i18n.init);
 
 let testUser: testUserType;
 let testOrganization: testOrganizationType;
@@ -93,6 +114,10 @@ describe("resolvers -> Mutation -> blockUser", () => {
 
   it(`throws UnauthorizedError if current user with _id === context.userId is not
   an admin of the organization with _id === args.organizationId`, async () => {
+    const { requestContext } = await import("../../../src/libraries");
+    const spy = vi
+      .spyOn(requestContext, "translate")
+      .mockImplementationOnce((message) => message);
     try {
       const args: MutationBlockUserArgs = {
         organizationId: testOrganization!.id,
@@ -103,9 +128,19 @@ describe("resolvers -> Mutation -> blockUser", () => {
         userId: testUser!.id,
       };
 
+      vi.doMock("../../../src/constants", async () => {
+        const actualConstants: object = await vi.importActual(
+          "../../../src/constants"
+        );
+        return {
+          ...actualConstants,
+        };
+      });
+
       await blockUserResolver?.({}, args, context);
     } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
+      expect(spy).toBeCalledWith(USER_NOT_AUTHORIZED_MESSAGE);
+      expect(error.message).toEqual(USER_NOT_AUTHORIZED_MESSAGE);
     }
   });
 

@@ -4,12 +4,15 @@ import { User, Organization, MembershipRequest } from "../../../src/models";
 import { MutationAcceptMembershipRequestArgs } from "../../../src/types/generatedGraphQLTypes";
 import { connect, disconnect } from "../../../src/db";
 import { acceptMembershipRequest as acceptMembershipRequestResolver } from "../../../src/resolvers/Mutation/acceptMembershipRequest";
+import i18n from "i18n";
+import express from "express";
+import { appConfig } from "../../../src/config";
 import {
   MEMBERSHIP_REQUEST_NOT_FOUND_MESSAGE,
   ORGANIZATION_NOT_FOUND_MESSAGE,
   USER_ALREADY_MEMBER_MESSAGE,
-  USER_NOT_AUTHORIZED,
   USER_NOT_FOUND_MESSAGE,
+  USER_NOT_AUTHORIZED_MESSAGE,
 } from "../../../src/constants";
 import { beforeAll, afterAll, describe, it, expect, vi } from "vitest";
 import { testUserType, testOrganizationType } from "../../helpers/userAndOrg";
@@ -21,6 +24,25 @@ import {
 let testUser: testUserType;
 let testOrganization: testOrganizationType;
 let testMembershipRequest: testMembershipRequestType;
+
+const app = express();
+i18n.configure({
+  directory: `${__dirname}/locales`,
+  staticCatalog: {
+    en: require("../../../locales/en.json"),
+    hi: require("../../../locales/hi.json"),
+    zh: require("../../../locales/zh.json"),
+    sp: require("../../../locales/sp.json"),
+    fr: require("../../../locales/fr.json"),
+  },
+  queryParameter: "lang",
+  defaultLocale: appConfig.defaultLocale,
+  locales: appConfig.supportedLocales,
+  autoReload: process.env.NODE_ENV !== "production",
+  updateFiles: process.env.NODE_ENV !== "production",
+  syncFiles: process.env.NODE_ENV !== "production",
+});
+app.use(i18n.init);
 
 beforeAll(async () => {
   await connect();
@@ -130,6 +152,10 @@ describe("resolvers -> Mutation -> acceptMembershipRequest", () => {
   it(`throws UnauthorizedError if user with _id === context.userId is not an
   admin of organization with _id === membershipRequest.organization for
   membershipRequest with _id === args.membershipRequestId`, async () => {
+    const { requestContext } = await import("../../../src/libraries");
+    const spy = vi
+      .spyOn(requestContext, "translate")
+      .mockImplementationOnce((message) => message);
     try {
       await MembershipRequest.updateOne(
         {
@@ -153,6 +179,15 @@ describe("resolvers -> Mutation -> acceptMembershipRequest", () => {
         }
       );
 
+      vi.doMock("../../../src/constants", async () => {
+        const actualConstants: object = await vi.importActual(
+          "../../../src/constants"
+        );
+        return {
+          ...actualConstants,
+        };
+      });
+
       const args: MutationAcceptMembershipRequestArgs = {
         membershipRequestId: testMembershipRequest!.id,
       };
@@ -163,7 +198,8 @@ describe("resolvers -> Mutation -> acceptMembershipRequest", () => {
 
       await acceptMembershipRequestResolver?.({}, args, context);
     } catch (error: any) {
-      expect(error.message).toEqual(USER_NOT_AUTHORIZED);
+      expect(spy).toBeCalledWith(USER_NOT_AUTHORIZED_MESSAGE);
+      expect(error.message).toEqual(USER_NOT_AUTHORIZED_MESSAGE);
     }
   });
 
