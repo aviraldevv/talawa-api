@@ -6,6 +6,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface representing a document for a direct chat message in the database(MongoDB).
  */
 export interface InterfaceDirectChatMessage {
+  tenantId: string;
   _id: Types.ObjectId;
   directChatMessageBelongsTo: PopulatedDoc<InterfaceDirectChat & Document>;
   sender: PopulatedDoc<InterfaceUser & Document>;
@@ -24,6 +25,10 @@ export interface InterfaceDirectChatMessage {
  * @param status - whether the message is active, blocked or deleted
  */
 const directChatMessageSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   directChatMessageBelongsTo: {
     type: Schema.Types.ObjectId,
     ref: "DirectChat",

@@ -7,6 +7,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface that represents a database(MongoDB) document for Post.
  */
 export interface InterfacePost {
+  tenantId: string;
   _id: Types.ObjectId;
   text: string;
   title: string | undefined;
@@ -36,6 +37,10 @@ export interface InterfacePost {
  * @param commentCount - Post comments count.
  */
 const postSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   text: {
     type: String,
     required: true,
@@ -92,7 +97,7 @@ const postSchema = new Schema({
 });
 
 postSchema.plugin(mongoosePaginate);
-postSchema.index({ organization: 1 }, { unique: false });
+postSchema.index({ tenantId: 1, organization: 1 }, { unique: false });
 
 const postModel = (): PaginateModel<InterfacePost> =>
   model<InterfacePost, PaginateModel<InterfacePost>>("Post", postSchema);

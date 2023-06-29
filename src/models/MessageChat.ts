@@ -5,6 +5,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface representing a document for a chat in the database(MongoDB).
  */
 export interface InterfaceMessageChat {
+  tenantID: string;
   _id: Types.ObjectId;
   message: string;
   languageBarrier: boolean;
@@ -21,6 +22,10 @@ export interface InterfaceMessageChat {
  * @param createdAt - Date when the chat was created
  */
 const messageChatSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   message: {
     type: String,
     required: true,

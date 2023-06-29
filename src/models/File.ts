@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
  * This is an interface representing a document for a file in the database(MongoDB).
  */
 export interface InterfaceFile {
+  tenantId: string;
   _id: Types.ObjectId;
   name: string;
   url: string | undefined;
@@ -25,6 +26,10 @@ export interface InterfaceFile {
  * @param status - Status
  */
 const fileSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,

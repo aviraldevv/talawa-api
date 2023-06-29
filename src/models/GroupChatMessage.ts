@@ -6,6 +6,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface that represents a database(MongoDB) document for Group Chat Message.
  */
 export interface InterfaceGroupChatMessage {
+  tenantID: string;
   _id: Types.ObjectId;
   groupChatMessageBelongsTo: PopulatedDoc<InterfaceGroupChat & Document>;
   sender: PopulatedDoc<InterfaceUser & Document>;
@@ -25,6 +26,10 @@ const groupChatMessageSchema = new Schema({
   groupChatMessageBelongsTo: {
     type: Schema.Types.ObjectId,
     ref: "GroupChat",
+    required: true,
+  },
+  tenantId: {
+    type: String,
     required: true,
   },
   sender: {

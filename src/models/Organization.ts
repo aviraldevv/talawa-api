@@ -8,6 +8,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface that represents a database(MongoDB) document for Organization.
  */
 export interface InterfaceOrganization {
+  tenantId: string;
   _id: Types.ObjectId;
   apiUrl: string | undefined;
   image: string | undefined;
@@ -47,6 +48,10 @@ export interface InterfaceOrganization {
  * @param createdAt - Time stamp of data creation.
  */
 const organizationSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   apiUrl: {
     type: String,
   },

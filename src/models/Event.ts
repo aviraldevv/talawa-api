@@ -7,6 +7,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface representing a document for a user attendee in the database(MongoDB).
  */
 export interface InterfaceUserAttende {
+  tenantId: string;
   userId: string;
   user: PopulatedDoc<InterfaceUser & Document>;
   status: string;
@@ -20,6 +21,10 @@ export interface InterfaceUserAttende {
  * @param createdAt - Creation Date
  */
 const userAttendeSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   userId: {
     type: String,
     required: true,

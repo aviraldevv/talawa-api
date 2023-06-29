@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
  * This is an interface that represents a database document.
  */
 export interface InterfaceLanguageModel {
+  tenantId: string;
   lang_code: string;
   value: string;
   verified: boolean;
@@ -18,6 +19,10 @@ export interface InterfaceLanguageModel {
  * @param createdAt - Time stamp of data creation.
  */
 const languageModelSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   lang_code: {
     type: String,
     required: true,

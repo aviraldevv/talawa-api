@@ -5,12 +5,17 @@ import type { InterfaceUser } from "./User";
 
 export interface InterfaceTagUser {
   _id: Types.ObjectId;
+  tenantID: string;
   userId: PopulatedDoc<InterfaceUser & Document>;
   tagId: PopulatedDoc<InterfaceOrganizationTagUser & Document>;
 }
 
 // Relational schema used to keep track of assigned tags to users
 const tagUserSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   userId: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -23,7 +28,7 @@ const tagUserSchema = new Schema({
   },
 });
 
-tagUserSchema.index({ userId: 1, tagId: 1 }, { unique: true });
+tagUserSchema.index({ tenantId: 1, userId: 1, tagId: 1 }, { unique: true });
 
 const tagUserModel = (): Model<InterfaceTagUser> =>
   model<InterfaceTagUser>("TagUser", tagUserSchema);

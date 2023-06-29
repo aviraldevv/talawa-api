@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
  * This is an interface representing a document for a donation in the database(MongoDB).
  */
 export interface InterfaceDonation {
+  tenantId: string;
   userId: Types.ObjectId | string;
   orgId: Types.ObjectId | string;
   nameOfOrg: string;
@@ -21,6 +22,10 @@ export interface InterfaceDonation {
  * @param amount - Amount of the donation
  */
 const donationSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   userId: {
     type: Schema.Types.ObjectId,
     required: true,

@@ -3,6 +3,7 @@ import { Schema, model, models } from "mongoose";
 import type { InterfaceOrganization } from "./Organization";
 
 export interface InterfaceOrganizationTagUser {
+  tenantId: string;
   _id: Types.ObjectId;
   organizationId: PopulatedDoc<InterfaceOrganization & Document>;
   parentTagId: PopulatedDoc<InterfaceOrganizationTagUser & Document>;
@@ -13,6 +14,10 @@ export interface InterfaceOrganizationTagUser {
 // Each tag belongs to a particular organization, and is private to the same.
 // Each tag can be nested to hold other sub-tags so as to create a heriecheal structure.
 const organizationTagUserSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
@@ -31,7 +36,7 @@ const organizationTagUserSchema = new Schema({
 });
 
 organizationTagUserSchema.index(
-  { organizationId: 1, parentOrganizationTagUserId: 1, name: 1 },
+  { tenantId: 1, organizationId: 1, parentOrganizationTagUserId: 1, name: 1 },
   { unique: true }
 );
 

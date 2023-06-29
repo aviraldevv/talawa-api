@@ -7,6 +7,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface representing a document for an event project in the database(MongoDB).
  */
 export interface InterfaceEventProject {
+  tenantId: string;
   _id: Types.ObjectId;
   title: string;
   description: string;
@@ -27,6 +28,10 @@ export interface InterfaceEventProject {
  * @param status - Status
  */
 const eventProjectSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,

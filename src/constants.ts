@@ -351,6 +351,8 @@ export const iosBundleId = ENV.iosBundleId;
 export const LAST_RESORT_SUPERADMIN_EMAIL =
   process.env.LAST_RESORT_SUPERADMIN_EMAIL;
 
+export const DEFAULT_TENANT_ID = ENV.DEFAULT_TENANT_ID;
+
 export const SMTP_OPTIONS = {
   IS_SMTP: process.env.IS_SMTP,
   SMTP_HOST: process.env.SMTP_HOST,

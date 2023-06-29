@@ -6,6 +6,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface that represents a database(MongoDB) document for Membership Request.
  */
 export interface InterfaceMembershipRequest {
+  tenantId: string;
   _id: Types.ObjectId;
   organization: PopulatedDoc<InterfaceOrganization & Document>;
   user: PopulatedDoc<InterfaceUser & Document> | undefined;
@@ -18,6 +19,10 @@ export interface InterfaceMembershipRequest {
  * @param status - Status.
  */
 const membershipRequestSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   organization: {
     type: Schema.Types.ObjectId,
     ref: "Organization",

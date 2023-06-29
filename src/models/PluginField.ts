@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
  * This is an interface that represents a database(MongoDB) document for Plugin Field.
  */
 export interface InterfacePluginField {
+  tenantId: string;
   _id: Types.ObjectId;
   key: string;
   value: string;
@@ -18,6 +19,10 @@ export interface InterfacePluginField {
  * @param createdAt - Time stamp of data creation.
  */
 const pluginFieldSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   key: {
     type: String,
     required: true,

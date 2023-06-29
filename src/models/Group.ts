@@ -6,6 +6,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface representing a document for a group in the database(MongoDB).
  */
 export interface InterfaceGroup {
+  tenantId: string;
   _id: Types.ObjectId;
   title: string;
   description: string | undefined;
@@ -23,6 +24,10 @@ export interface InterfaceGroup {
  * @param admins - Admins
  */
 const groupSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,

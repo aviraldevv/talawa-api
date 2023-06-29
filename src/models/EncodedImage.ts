@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
  * This is an interface that represents a database(MongoDB) document for Encoded Image.
  */
 export interface InterfaceEncodedImage {
+  tenantId: string;
   _id: Types.ObjectId;
   fileName: string;
   content: string;
@@ -16,6 +17,10 @@ export interface InterfaceEncodedImage {
  * @param numberOfUses - Number of Uses.
  */
 const encodedImageSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   fileName: {
     type: String,
     required: true,

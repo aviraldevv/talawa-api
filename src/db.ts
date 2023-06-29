@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
-import { MONGO_DB_URL } from "./constants";
+import { MONGO_DB_URL, DEFAULT_TENANT_ID } from "./constants";
 import { logger } from "./libraries";
+
+const tenantConnectionMap: { [key: string]: mongoose.Connection } = {};
 
 export const connect = async (): Promise<void> => {
   try {
@@ -44,6 +46,48 @@ export const connect = async (): Promise<void> => {
   }
 };
 
+export const getTenantConnection = (tenantId: string): mongoose.Connection => {
+  if (!tenantConnectionMap[tenantId]) {
+    const tenantDbUrl = `${MONGO_DB_URL}/tenant_${tenantId}`;
+
+    // Create a new connection for the tenant-specific database
+    const tenantConnection = mongoose.createConnection(tenantDbUrl, {
+      useCreateIndex: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useNewUrlParser: true,
+    });
+
+    // Store the connection in the map
+    tenantConnectionMap[tenantId] = tenantConnection;
+  }
+  return tenantConnectionMap[tenantId];
+};
+
 export const disconnect = async (): Promise<void> => {
+  // Close all tenant-specific connections
+  for (const tenantId in tenantConnectionMap) {
+    await tenantConnectionMap[tenantId].close();
+  }
+
+  // Close the main connection
   await mongoose.connection.close();
+};
+
+connect();
+
+export const getDefaultConnection = (): mongoose.Connection =>
+  mongoose.connection;
+
+// Export a function to get the connection for a specific tenant
+export const getConnectionForTenant = (
+  tenantId: string | undefined = DEFAULT_TENANT_ID
+): mongoose.Connection => {
+  // Use the default connection if the tenant ID is not provided or is the default tenant
+  if (!tenantId || tenantId === DEFAULT_TENANT_ID) {
+    return getDefaultConnection();
+  }
+
+  // Use the tenant-specific connection for the provided tenant ID
+  return getTenantConnection(tenantId);
 };

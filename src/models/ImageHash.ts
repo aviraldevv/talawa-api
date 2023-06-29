@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
  * This is an interface that represents a database(MongoDB) document for Image Hash.
  */
 export interface InterfaceImageHash {
+  tenantId: string;
   _id: Types.ObjectId;
   hashValue: string;
   fileName: string;
@@ -18,6 +19,10 @@ export interface InterfaceImageHash {
  * @param status - Status.
  */
 const imageHashSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   hashValue: {
     type: String,
     required: true,

@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
  * This is an interface that represents a database(MongoDB) document for Plugin.
  */
 export interface InterfacePlugin {
+  tenantID: string;
   _id: Types.ObjectId;
   pluginName: string;
   pluginCreatedBy: string;
@@ -21,6 +22,10 @@ export interface InterfacePlugin {
  */
 
 const pluginSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   pluginName: {
     type: String,
     required: true,

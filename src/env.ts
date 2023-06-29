@@ -5,6 +5,7 @@ export const envSchema = z
     ACCESS_TOKEN_SECRET: z.string().nonempty(),
     REFRESH_TOKEN_SECRET: z.string().nonempty(),
     MONGO_DB_URL: z.string().url(),
+    DEFAULT_TENANT_ID: z.string().nonempty(),
 
     RECAPTCHA_SECRET_KEY: z.string().nonempty(),
     RECAPTCHA_SITE_KEY: z.string().nonempty(),

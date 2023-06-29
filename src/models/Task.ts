@@ -7,6 +7,7 @@ import type { InterfaceUser } from "./User";
  */
 export interface InterfaceTask {
   _id: Types.ObjectId;
+  tenantID: string;
   title: string;
   description: string | undefined;
   status: string;
@@ -26,6 +27,10 @@ export interface InterfaceTask {
  * @param creator - Task creator, refer to `User` model.
  */
 const taskSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,

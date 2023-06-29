@@ -10,6 +10,7 @@ import type { InterfaceOrganization } from "./Organization";
  */
 export interface InterfaceUser {
   _id: Types.ObjectId;
+  tenantID: string;
   image: string | undefined | null;
   token: string | undefined;
   tokenVersion: number;
@@ -61,6 +62,10 @@ export interface InterfaceUser {
  * @param createdAt - Time stamp of data creation.
  */
 const userSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   image: {
     type: String,
   },

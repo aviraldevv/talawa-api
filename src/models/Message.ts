@@ -6,6 +6,7 @@ import type { InterfaceUser } from "./User";
  * This is an interface that represents a database(MongoDB) document for Message.
  */
 export interface InterfaceMessage {
+  tenantId: string;
   _id: Types.ObjectId;
   text: string;
   imageUrl: string | undefined;
@@ -26,6 +27,10 @@ export interface InterfaceMessage {
  * @param status - Status.
  */
 const messageSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   text: {
     type: String,
     required: true,

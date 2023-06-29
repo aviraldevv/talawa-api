@@ -6,6 +6,7 @@ import type { InterfacePost } from "./Post";
  * This is an interface representing a document for a comment in the database(MongoDB).
  */
 export interface InterfaceComment {
+  tenantId: string;
   _id: Types.ObjectId;
   text: string;
   createdAt: Date;
@@ -26,6 +27,10 @@ export interface InterfaceComment {
  * @param status - whether the comment is active, blocked or deleted.
  */
 const commentSchema = new Schema({
+  tenantId: {
+    type: String,
+    required: true,
+  },
   text: {
     type: String,
     required: true,
