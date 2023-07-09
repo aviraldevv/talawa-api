@@ -1,7 +1,6 @@
 import type { Types, PopulatedDoc, Document, Model } from "mongoose";
 import { Schema, model, models } from "mongoose";
 import type { InterfaceOrganization } from "./Organization";
-import type { InterfaceTask } from "./Task";
 import type { InterfaceUser } from "./User";
 /**
  * This is an interface representing a document for a user attendee in the database(MongoDB).
@@ -45,6 +44,7 @@ const userAttendeSchema = new Schema({
     default: Date.now,
   },
 });
+
 /**
  * This is an interface representing a document for an event in the database(MongoDB).
  */
@@ -66,12 +66,11 @@ export interface InterfaceEvent {
   isPublic: boolean;
   isRegisterable: boolean;
   creator: PopulatedDoc<InterfaceUser & Document>;
-  registrants: PopulatedDoc<InterfaceUserAttende & Document>[];
   admins: PopulatedDoc<InterfaceUser & Document>[];
   organization: PopulatedDoc<InterfaceOrganization & Document>;
-  tasks: PopulatedDoc<InterfaceTask & Document>[];
   status: string;
 }
+
 /**
  * This is the Structure of the Event
  * @param title - Title of the event
@@ -92,9 +91,9 @@ export interface InterfaceEvent {
  * @param creator - Creator of the event
  * @param admins - Admins
  * @param organization - Organization
- * @param tasks - Tasks
  * @param status - whether the event is active, blocked, or deleted.
  */
+
 const eventSchema = new Schema({
   title: {
     type: String,
@@ -175,7 +174,6 @@ const eventSchema = new Schema({
     ref: "User",
     required: true,
   },
-  registrants: [userAttendeSchema],
   admins: [
     {
       type: Schema.Types.ObjectId,
@@ -188,12 +186,6 @@ const eventSchema = new Schema({
     ref: "Organization",
     required: true,
   },
-  tasks: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Task",
-    },
-  ],
   status: {
     type: String,
     required: true,
