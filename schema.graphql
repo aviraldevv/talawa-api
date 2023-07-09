@@ -895,6 +895,7 @@ type User {
   pluginCreationAllowed: Boolean
   registeredEvents: [Event]
   tagsAssignedWith(after: String, before: String, first: PositiveInt, last: PositiveInt, organizationId: ID): UserTagsConnection
+  tenantId: String!
   tokenVersion: Int!
   userType: String
 }
@@ -922,6 +923,7 @@ input UserInput {
   lastName: String!
   organizationUserBelongsToId: ID
   password: String!
+  tenantId: String
 }
 
 enum UserOrderByInput {

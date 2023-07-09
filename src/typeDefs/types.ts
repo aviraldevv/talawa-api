@@ -345,6 +345,7 @@ export const types = gql`
   type User {
     tokenVersion: Int!
     _id: ID!
+    tenantId: String!
     firstName: String!
     lastName: String!
     email: EmailAddress!

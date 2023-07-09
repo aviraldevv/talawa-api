@@ -324,6 +324,7 @@ export const inputs = gql`
   }
 
   input UserInput {
+    tenantId: String
     firstName: String!
     lastName: String!
     email: EmailAddress!

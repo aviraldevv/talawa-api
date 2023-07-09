@@ -1549,6 +1549,7 @@ export type User = {
   pluginCreationAllowed?: Maybe<Scalars['Boolean']>;
   registeredEvents?: Maybe<Array<Maybe<Event>>>;
   tagsAssignedWith?: Maybe<UserTagsConnection>;
+  tenantId: Scalars['String'];
   tokenVersion: Scalars['Int'];
   userType?: Maybe<Scalars['String']>;
 };
@@ -1587,6 +1588,7 @@ export type UserInput = {
   lastName: Scalars['String'];
   organizationUserBelongsToId?: InputMaybe<Scalars['ID']>;
   password: Scalars['String'];
+  tenantId?: InputMaybe<Scalars['String']>;
 };
 
 export type UserOrderByInput =
@@ -2597,6 +2599,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   pluginCreationAllowed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   registeredEvents?: Resolver<Maybe<Array<Maybe<ResolversTypes['Event']>>>, ParentType, ContextType>;
   tagsAssignedWith?: Resolver<Maybe<ResolversTypes['UserTagsConnection']>, ParentType, ContextType, Partial<UserTagsAssignedWithArgs>>;
+  tenantId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tokenVersion?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   userType?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
